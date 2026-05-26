@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Ultimate Brain Math Game</title>
+
+<script src="https://cdn.tailwindcss.com"></script>
+
+<style>
+
+body{
+    margin:0;
+    min-height:100vh;
+    background:#020617;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    font-family:Arial, Helvetica, sans-serif;
+    color:white;
+}
+
+.game-container{
+    width:90%;
+    max-width:900px;
+    text-align:center;
+}
+
+.title{
+    font-size:60px;
+    font-weight:bold;
+    margin-bottom:10px;
+}
+
+.subtitle{
+    font-size:20px;
+    opacity:0.7;
+    margin-bottom:30px;
+}
+
+.level{
+    font-size:25px;
+    color:#38bdf8;
+    margin-bottom:20px;
+}
+
+.question{
+    font-size:70px;
+    font-weight:bold;
+    margin:40px 0;
+    min-height:100px;
+}
+
+input{
+    width:280px;
+    padding:20px;
+    font-size:40px;
+    border:none;
+    border-radius:20px;
+    outline:none;
+    text-align:center;
+    background:white;
+    color:black;
+    font-weight:bold;
+}
+
+input::placeholder{
+    color:gray;
+}
+
+button{
+    margin-top:30px;
+    padding:15px 40px;
+    border:none;
+    border-radius:15px;
+    background:#4f46e5;
+    color:white;
+    font-size:24px;
+    cursor:pointer;
+    transition:0.2s;
+}
+
+button:hover{
+    transform:scale(1.05);
+}
+
+.stats{
+    display:flex;
+    justify-content:center;
+    gap:50px;
+    margin-top:40px;
+    flex-wrap:wrap;
+    font-size:28px;
+}
+
+.message{
+    margin-top:25px;
+    font-size:30px;
+    height:40px;
+}
+
+.combo{
+    color:#facc15;
+}
+
+.final{
+    margin-top:30px;
+    font-size:40px;
+    color:#22c55e;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="game-container">
+
+    <div class="title">
+        ULTIMATE MATH BRAIN
+    </div>
+
+    <div class="subtitle">
+        Semakin tinggi score, soal makin sulit 🔥
+    </div>
+
+    <div class="level" id="level">
+        Level: Easy
+    </div>
+
+    <div class="question" id="question">
+        Press Start
+    </div>
+
+    <input 
+        type="number"
+        id="answer"
+        placeholder="Answer Here"
+    >
+
+    <br>
+
+    <button onclick="startGame()">
+        START GAME
+    </button>
+
+    <div class="stats">
+
+        <div>
+            Score:
+            <span id="score">0</span>
+        </div>
+
+        <div>
+            Time:
+            <span id="time">90</span>
+        </div>
+
+        <div class="combo">
+            Combo:
+            <span id="combo">0</span>
+        </div>
+
+    </div>
+
+    <div class="message" id="message"></div>
+
+    <div class="final" id="final"></div>
+
+</div>
+
+<script>
+
+let score = 0;
+let combo = 0;
+let time = 90;
+let currentAnswer = 0;
+let gameRunning = false;
+let timer;
+
+const questionText = document.getElementById("question");
+const answerInput = document.getElementById("answer");
+const scoreText = document.getElementById("score");
+const comboText = document.getElementById("combo");
+const timeText = document.getElementById("time");
+const messageText = document.getElementById("message");
+const finalText = document.getElementById("final");
+const levelText = document.getElementById("level");
+
+function random(min,max){
+
+    return Math.floor(
+        Math.random() * (max-min+1)
+    ) + min;
+
+}
+
+function generateQuestion(){
+
+    let difficulty = "Easy";
+
+    if(score >= 5){
+        difficulty = "Medium";
+    }
+
+    if(score >= 15){
+        difficulty = "Hard";
+    }
+
+    if(score >= 30){
+        difficulty = "Extreme";
+    }
+
+    levelText.innerHTML =
+    "Level: " + difficulty;
+
+    // EASY
+    if(difficulty === "Easy"){
+
+        const a = random(1,20);
+        const b = random(1,20);
+
+        const operators = ["+","-","×"];
+
+        const op =
+        operators[random(0,2)];
+
+        if(op === "+"){
+            currentAnswer = a+b;
+        }
+
+        if(op === "-"){
+            currentAnswer = a-b;
+        }
+
+        if(op === "×"){
+            currentAnswer = a*b;
+        }
+
+        questionText.innerHTML =
+        `${a} ${op} ${b}`;
+
+    }
+
+    // MEDIUM
+    if(difficulty === "Medium"){
+
+        const a = random(10,50);
+        const b = random(10,50);
+
+        const operators =
+        ["+","-","×","÷"];
+
+        const op =
+        operators[random(0,3)];
+
+        if(op === "+"){
+            currentAnswer = a+b;
+            questionText.innerHTML =
+            `${a} + ${b}`;
+        }
+
+        if(op === "-"){
+            currentAnswer = a-b;
+            questionText.innerHTML =
+            `${a} - ${b}`;
+        }
+
+        if(op === "×"){
+            currentAnswer = a*b;
+            questionText.innerHTML =
+            `${a} × ${b}`;
+        }
+
+        if(op === "÷"){
+
+            currentAnswer = a;
+
+            questionText.innerHTML =
+            `${a*b} ÷ ${b}`;
+
+        }
+
+    }
+
+    // HARD
+    if(difficulty === "Hard"){
+
+        const type = random(1,3);
+
+        // Pangkat
+        if(type === 1){
+
+            const a = random(2,9);
+            const b = random(2,4);
+
+            currentAnswer = a ** b;
+
+            questionText.innerHTML =
+            `${a}<sup>${b}</sup>`;
+
+        }
+
+        // Akar
+        if(type === 2){
+
+            const root = random(2,15);
+
+            currentAnswer = root;
+
+            questionText.innerHTML =
+            `√${root*root}`;
+
+        }
+
+        // Multi Operation
+        if(type === 3){
+
+            const a = random(1,20);
+            const b = random(1,20);
+            const c = random(1,10);
+
+            currentAnswer =
+            (a+b)*c;
+
+            questionText.innerHTML =
+            `(${a}+${b}) × ${c}`;
+
+        }
+
+    }
+
+    // EXTREME
+    if(difficulty === "Extreme"){
+
+        const type = random(1,4);
+
+        // Algebra
+        if(type === 1){
+
+            const x = random(2,20);
+            const a = random(2,10);
+            const b = random(1,20);
+
+            currentAnswer = x;
+
+            questionText.innerHTML =
+            `${a}x + ${b} = ${a*x+b}`;
+
+        }
+
+        // Persen
+        if(type === 2){
+
+            const base =
+            random(100,500);
+
+            const percent =
+            random(10,90);
+
+            currentAnswer =
+            (base*percent)/100;
+
+            questionText.innerHTML =
+            `${percent}% dari ${base}`;
+
+        }
+
+        // Memory Math
+        if(type === 3){
+
+            const a = random(10,50);
+            const b = random(10,50);
+            const c = random(1,20);
+
+            currentAnswer =
+            (a*b)-c;
+
+            questionText.innerHTML =
+            `(${a} × ${b}) - ${c}`;
+
+        }
+
+        // Equation
+        if(type === 4){
+
+            const a = random(1,12);
+            const b = random(1,12);
+            const c = random(1,12);
+
+            currentAnswer =
+            (a+b+c)*2;
+
+            questionText.innerHTML =
+            `(${a}+${b}+${c}) × 2`;
+
+        }
+
+    }
+
+}
+
+function startGame(){
+
+    score = 0;
+    combo = 0;
+    time = 90;
+
+    gameRunning = true;
+
+    scoreText.innerHTML = score;
+    comboText.innerHTML = combo;
+    timeText.innerHTML = time;
+
+    finalText.innerHTML = "";
+
+    generateQuestion();
+
+    answerInput.focus();
+
+    clearInterval(timer);
+
+    timer = setInterval(()=>{
+
+        time--;
+
+        timeText.innerHTML = time;
+
+        if(time <= 0){
+
+            endGame();
+
+        }
+
+    },1000);
+
+}
+
+function endGame(){
+
+    gameRunning = false;
+
+    clearInterval(timer);
+
+    finalText.innerHTML =
+    `🔥 FINAL SCORE: ${score}`;
+
+}
+
+answerInput.addEventListener("keydown",(e)=>{
+
+    if(e.key === "Enter" && gameRunning){
+
+        const userAnswer =
+        Number(answerInput.value);
+
+        if(userAnswer === currentAnswer){
+
+            combo++;
+
+            score += 1 + Math.floor(combo/3);
+
+            scoreText.innerHTML = score;
+
+            comboText.innerHTML = combo;
+
+            messageText.innerHTML =
+            "CORRECT ✅";
+
+            // BONUS TIME
+            if(combo % 5 === 0){
+
+                time += 5;
+
+                timeText.innerHTML = time;
+
+                messageText.innerHTML =
+                "COMBO BONUS +5s 🔥";
+
+            }
+
+        }else{
+
+            combo = 0;
+
+            comboText.innerHTML = combo;
+
+            messageText.innerHTML =
+            "WRONG ❌";
+
+        }
+
+        answerInput.value = "";
+
+        generateQuestion();
+
+    }
+
+});
+
+</script>
+
+</body>
+</html>
